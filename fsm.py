@@ -154,22 +154,22 @@ class RootState(State):
     def on_trigger(self, trigger):
         f_num_sys = None
 
-        msg = (u"двоичную|2|2ую|bin")
+        msg = (u"двоичной|2|2ой|bin")
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 2
 
-        msg = (u"десятичную|10|10ую|dec")
+        msg = (u"десятичной|10|10ой|dec")
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 10
 
-        msg = (u"восьмеричную|8|8ую|oct")
+        msg = (u"восьмеричной|8|8ой|oct")
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 8
 
-        msg = (u"шестнадцатеричную|16|16ую|hex")
+        msg = (u"шестнадцатеричной|16|16ой|hex")
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 16
