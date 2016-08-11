@@ -18,21 +18,21 @@ class State(object):
         pass
 
     def _on_trigger(self, trigger):
-        log.debug("== " + str(self))
+        log.debug('== ' + str(self))
         return self.on_trigger(trigger)
 
     def on_enter(self, trigger):
         pass
 
     def _on_enter(self, trigger):
-        log.debug("-> " + str(self))
+        log.debug('-> ' + str(self))
         return self.on_enter(trigger)
 
     def on_exit(self, trigger):
         pass
 
     def _on_exit(self, trigger):
-        log.debug("<- " + str(self))
+        log.debug('<- ' + str(self))
         return self.on_exit(trigger)
 
 
@@ -147,35 +147,35 @@ class BootStrapState(State):
 class RootState(State):
 
     def on_enter(self, trigger):
-        trigger.send_keys(u"Из какой системы будем переводить?",
-                          [[u"Двоичной", u"Десятичной",
-                            u"Восьмеричной", u"Шестнадцатеричной"]])
+        trigger.send_keys(u'Из какой системы будем переводить?',
+                          [[u'Двоичной', u'Восьмеричной',
+                            u'Десятичной', u'Шестнадцатеричной']])
 
     def on_trigger(self, trigger):
         f_num_sys = None
 
-        msg = (u"двоичной|2|2ой|bin")
+        msg = (u'двоичной|2|2ичной|bin')
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 2
 
-        msg = (u"десятичной|10|10ой|dec")
-
-        if tx.equals(trigger.txt, msg):
-            f_num_sys = 10
-
-        msg = (u"восьмеричной|8|8ой|oct")
+        msg = (u'восьмеричной|8|8ичной|oct')
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 8
 
-        msg = (u"шестнадцатеричной|16|16ой|hex")
+        msg = (u'десятичной|10|10ичной|dec')
+
+        if tx.equals(trigger.txt, msg):
+            f_num_sys = 10
+
+        msg = (u'шестнадцатеричной|16|16ичной|hex')
 
         if tx.equals(trigger.txt, msg):
             f_num_sys = 16
 
         if not f_num_sys:
-            trigger.send_msg(u"Извини, не понял")
+            trigger.send_msg(u'Извини, не понял')
             return self
 
         if f_num_sys:
@@ -190,35 +190,35 @@ class AskSystemState(State):
         self.f_num_sys = f_num_sys
 
     def on_enter(self, trigger):
-        trigger.send_keys(u"В какую?",
-                          [[u"Двоичную", u"Десятичную",
-                            u"Восьмеричную", u"Шестнадцатеричную"]])
+        trigger.send_keys(u'В какую?',
+                          [[u'Двоичную', u'Восьмеричную',
+                            u'Десятичную', u'Шестнадцатеричную']])
 
     def on_trigger(self, trigger):
         t_num_sys = None
 
-        msg = (u"двоичную|2|2ую|bin")
+        msg = (u'двоичную|2|2ичную|bin')
 
         if tx.equals(trigger.txt, msg):
             t_num_sys = 2
 
-        msg = (u"десятичную|10|10ую|dec")
-
-        if tx.equals(trigger.txt, msg):
-            t_num_sys = 10
-
-        msg = (u"восьмеричную|8|8ую|oct")
+        msg = (u'восьмеричную|8|8ичную|oct')
 
         if tx.equals(trigger.txt, msg):
             t_num_sys = 8
 
-        msg = (u"шестнадцатеричную|16|16ую|hex")
+        msg = (u'десятичную|10|10ичную|dec')
+
+        if tx.equals(trigger.txt, msg):
+            t_num_sys = 10
+
+        msg = (u'шестнадцатеричную|16|16ичную|hex')
 
         if tx.equals(trigger.txt, msg):
             t_num_sys = 16
 
         if not t_num_sys:
-            trigger.send_msg(u"Извини, не понял")
+            trigger.send_msg(u'Извини, не понял')
             return self
 
         if t_num_sys:
@@ -229,20 +229,20 @@ class AskSystemState(State):
 
 class AskNumberState(State):
 
-    numbers_rgx = re.compile(r"[^0-9]")
+    numbers_rgx = re.compile(r'[^0-9]')
 
     def __init__(self, f_num_sys, t_num_sys):
         self.f_num_sys = f_num_sys
         self.t_num_sys = t_num_sys
 
     def on_enter(self, trigger):
-        trigger.send_msg(u"Введите число")
+        trigger.send_msg(u'Введи число')
 
     def on_trigger(self, trigger):
         try:
-            val = int(AskNumberState.numbers_rgx.sub("", trigger.txt))
+            val = int(AskNumberState.numbers_rgx.sub('', trigger.txt))
             return NumberCalculation(val, self.f_num_sys, self.t_num_sys)
-        except valError:
+        except ValueError:
             return self
 
 
@@ -255,28 +255,37 @@ class NumberCalculation(State):
 
     def on_enter(self, trigger):
         if self.f_num_sys and self.t_num_sys:
-            trigger.send_msg(u"Результат: ")
-            msg = convert_num_sys(str(self.val), self.f_num_sys, self.t_num_sys)
-            trigger.send_msg(str(msg))
-            trigger.send_keys(u"Ещё хочешь? :)",
-                              [[u"Да", u"Хватит"]])
+            try:
+                self.val = str(self.val)
+                msg = convert_num_sys(self.val, self.f_num_sys, self.t_num_sys)
+                trigger.send_msg(u'Результат: ')
+                trigger.send_msg(str(msg))
+                trigger.send_keys(u'Ещё хочешь? :)',
+                                  [[u'Да', u'Хватит']])
+            except ValueError:
+                trigger.send_msg('Странное число. Попробуй ввести ещё раз')
+                return AskNumberState(self.f_num_sys, self.t_num_sys)
+
+            except TypeError:
+                trigger.send_msg('Это не число. Меня обманули')
+                return AskNumberState(self.f_num_sys, self.t_num_sys)
 
     def on_trigger(self, trigger):
-        if tx.equals(trigger.txt, u"хватит|нет|н|-"):
-            return trigger.send_msg('Cya, %s! :3' % trigger.name)
-        if tx.equals(trigger.txt, u"покажи ещё|покажи еще|ещё|еще|да|+|д"):
+        if tx.equals(trigger.txt, u'хватит|нет|н|-'):
+            return trigger.send_msg('Cya, {}! :3'.format(trigger.name))
+        if tx.equals(trigger.txt, u'покажи ещё|покажи еще|ещё|еще|да|+|д'):
             return RootState()
 
 
 class FeedbackState(State):
 
     def on_enter(self, trigger):
-        trigger.send_msg(u"В целях улучшения качества обслуживания "
-                         u"все разговоры записываются ;) Напиши свои мысли")
+        trigger.send_msg(u'В целях улучшения качества обслуживания '
+                         u'все разговоры записываются ;) Напиши свои мысли')
 
     def on_trigger(self, trigger):
-        log.warn("feedback: " + str(trigger.update))
-        trigger.send_msg(u"Спасибо!")
+        log.warn('feedback: ' + str(trigger.update))
+        trigger.send_msg(u'Спасибо!')
 
         return RootState()
 
@@ -286,37 +295,37 @@ class FeedbackState(State):
 class StartFilter(Filter):
 
     def on_process(self, current_state, trigger):
-        if tx.is_command(trigger.txt, "/start|/help"):
+        if tx.is_command(trigger.txt, '/start|/help'):
 
-            trigger.send_msg(u"Если у тебя что-то пошло не так "
-                             u"или ты хочешь поделиться с нами своими "
-                             u"мыслями - просто напиши в чате /feedback "
-                             u"и опиши, что случилось. "
-                             u"Мы обязательно что-нибудь придумаем!")
+            trigger.send_msg(u'Если у тебя что-то пошло не так '
+                             u'или ты хочешь поделиться с нами своими '
+                             u'мыслями - просто напиши в чате /feedback '
+                             u'и опиши, что случилось. '
+                             u'Мы обязательно что-нибудь придумаем!')
 
             return RootState()
 
 
 class PoliteFilter(Filter):
     def on_process(self, current_state, trigger):
-        if tx.equals(trigger.txt, u"привет|здравствуй|хай|hello|hallo|hi"):
-            trigger.send_msg(u'Привет, %s! ^^' % trigger.name)
+        if tx.equals(trigger.txt, u'привет|здравствуй|хай|hello|hallo|hi'):
+            trigger.send_msg(u'Привет, {}! ^^'.format(trigger.name))
 
             if type(current_state) == BootStrapState:
                 return RootState()
 
             return current_state
 
-        byes = (u"пока|до свидания|бб|66|бай-бай|пока-пока"
-                u"|goodbye|спокойной ночи")
+        byes = (u'пока|до свидания|бб|66|бай-бай|пока-пока'
+                u'|goodbye|спокойной ночи')
 
         if tx.equals(trigger.txt, byes):
-            trigger.send_msg(u'Пока, %s! :3' % trigger.name)
+            trigger.send_msg(u'Пока, {}! :3'.format(trigger.name))
             return BootStrapState()
 
 
 class FeedbackFilter(Filter):
 
     def on_process(self, current_state, trigger):
-        if tx.is_command(trigger.txt, "/feedback"):
+        if tx.is_command(trigger.txt, '/feedback'):
             return FeedbackState()
