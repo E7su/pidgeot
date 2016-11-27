@@ -148,8 +148,8 @@ class RootState(State):
 
     def on_enter(self, trigger):
         trigger.send_keys(u'Из какой системы будем переводить?',
-                          [[u'Двоичной', u'Восьмеричной',
-                            u'Десятичной', u'Шестнадцатеричной']])
+                          [[u'2ичной', u'8иричной',
+                            u'10ичной', u'16еричной']])
 
     def on_trigger(self, trigger):
         f_num_sys = None
@@ -191,8 +191,8 @@ class AskSystemState(State):
 
     def on_enter(self, trigger):
         trigger.send_keys(u'В какую?',
-                          [[u'Двоичную', u'Восьмеричную',
-                            u'Десятичную', u'Шестнадцатеричную']])
+                        [[u'2ичной', u'8иричной',
+                            u'10ичной', u'16еричной']])
 
     def on_trigger(self, trigger):
         t_num_sys = None
