@@ -5,7 +5,7 @@ import os
 import logging as log
 
 import telegram as tm
-
+from telegram.ext import Updater, MessageHandler, Filters, CommandHandler
 import human
 import fsm
 
@@ -25,9 +25,11 @@ def handle_update(bot, update):
 
 
 def create_bot():
-    updater = tm.Updater(token=os.environ['TELEGRAM_TOKEN'])
-    updater.dispatcher.addTelegramMessageHandler(handle_update)
-    updater.dispatcher.addUnknownTelegramCommandHandler(handle_update)
+    updater = Updater(token=os.environ['TELEGRAM_TOKEN'])
+    updater.dispatcher.add_handler(CommandHandler('start', handle_update))
+    updater.dispatcher.add_handler(MessageHandler(Filters.text|Filters.contact,handle_update))
+    unknown_handler = MessageHandler(Filters.command, handle_update)
+    updater.dispatcher.add_handler(unknown_handler)
 
     return updater
 
